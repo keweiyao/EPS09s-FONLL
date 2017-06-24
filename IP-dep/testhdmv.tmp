@@ -1,0 +1,23 @@
+80          ! # of gaussian points
+           0           0       10550  ! nptype, ngroup, nset (beam1)
+           0           0       10550  ! nptype, ngroup, nset (beam2)
+  0.22600015483267408       ! Lambda_5
+dfpy       ! task
+ 0          ! 1 to convert dsig/dpt^2 --> dsig/dpt
+           3        !# of light flavours
+ 1    ! 1 for the nlf+1  scheme, 0 for nlf scheme
+ 1    ! alpha_S --> alpha_S/rscalpha
+AA+ BB+   0.27600000D+04     ! process and CM energy
+ 1      ! 1 for CM, 2 for FT, 3 for lab, y and eta
+al          ! gg, qq, qg, any other for all
+ 1      ! 1 mu0=sqrt(m^2+pt^2), 2 mu0=pt, 3 sequence (in mu0)
+   1.0000000000000000             ! xmu_fact(hadron)=ffact*mu0
+ 0            ! 0 normal, 1 for tests
+   1.0000000000000000           ! xmu_ren=fren*mu0
+ -1  ! mass value, <0 to set rapidity and pt values
+   0.0000000000000000     
+ *
+   1.0000000000000000     
+ *
+   1.3000000000000000       0  ! 0 for massive, 1 for massless
+.
