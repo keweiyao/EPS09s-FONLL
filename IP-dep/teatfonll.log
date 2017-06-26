@@ -1,7 +1,0 @@
-     -208001   5.0000000000000000        1380.0000000000000                0           0       10550  ! beam1: type, ener.,  nptype, ngroup, nset
-     -208001   5.0000000000000000        1380.0000000000000                0           0       10550  ! beam2: type, ener.,  nptype, ngroup, nset
-   1.3000000000000000       ! heavy quark mass
-  -1.0000000000000000       ! Lambda_5, <=0 for default
-   1.0000000000000000        1.0000000000000000       !  fact. and ren. scale factors
-   10.000000000000000        0.0000000000000000       ! pt,y_lab
-           1    ! icalctype

@@ -1,1 +1,7 @@
 *.o
+*.so
+*.hdf5
+*.log
+*.outlog
+*.tmp
+IP-dep/build

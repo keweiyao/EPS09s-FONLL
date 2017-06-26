@@ -122,7 +122,6 @@ c
       xfb = 0
 c      if(part.eq.'pr'.or.part.eq.'nu') then
 c         ih=1
-      write(*,*) "here", part, ih
       if(part.eq.'pr') then
          ih=1
       elseif(part.eq.'nu') then
@@ -138,7 +137,6 @@ c         ih=1
 	  elseif(part.eq.'bb') then
          ih=200
       endif
-      write(*,*) "here", part, ih
       xq2=xmu2
       xx=x
       if(istrsc.eq.1) then

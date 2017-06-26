@@ -85,7 +85,7 @@ c before calling fonll0
          if(prefix(jprefix:jprefix).ne.' ') goto 11
       enddo
  11   continue
-      open(unit=itm,file=prefix(1:jprefix)//'fonll.log')
+      open(unit=itm,file='log/'//prefix(1:jprefix)//'fonll.log')
       write(*,*) ' pdf type is described by 3 numbers'
       write(*,*) ' pdflib uses all 3; other may use less'
       write(*,*) ' All energy values are in GeV'
@@ -172,7 +172,7 @@ c....used to check higher orders below
           ratio = 0d0
           reserr = 0d0
       endif
-      open(11,file=prefix(1:jprefix)//'.outlog',access='append')
+      open(11,file='log/'//prefix(1:jprefix)//'.outlog',access='append')
 c... commented out because a bug (#474382) in gfortran 4.4
 c... produces an infinite loop
 c wind file to end
@@ -180,7 +180,7 @@ c      call toend(11)
 c... now using the line above with access='append', which seems to
 c... work both in g77 and gfortran 4.4. Note however that the official
 c... gfortran syntax is supposed to be
-c...      open(11,file=prefix(1:jprefix)//'.outlog',position='append')
+c...      open(11,file='log/'//prefix(1:jprefix)//'.outlog',position='append')
 c...
       write(11,'(a,a,a)') versionstring
       write(11,111)ibeam1,ener1, nptype1, ngroup1, nset1,
@@ -197,7 +197,7 @@ c...
      #       'hdmv=',d12.6,',hdml=',d12.6,',phmv=',d12.6,',phml=',d12.6,
      #       / ,'hdrs=',d12.4,'+-',d8.2,',phrs=',d12.6,'+-',d8.2,/,
      #       '(rs-ml)/mv=',d8.2)
-      open(11,file=prefix(1:jprefix)//'.out')
+      open(11,file='log/'//prefix(1:jprefix)//'.out')
 c...check if higher orders are very large
 c      if(dabs(ratio).gt.5d0)  then
 c...check if numerical error on resummed is large

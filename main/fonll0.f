@@ -193,9 +193,9 @@ c prepare input file
       do im0=0,1
 c im0=0: massive, 1: massless
       if(im0.eq.0) then
-         open(unit=itm, file=prefix(1:jprefix)//'hdmv.tmp')
+         open(unit=itm, file='log/'//prefix(1:jprefix)//'hdmv.tmp')
       else
-         open(unit=itm, file=prefix(1:jprefix)//'hdml.tmp')
+         open(unit=itm, file='log/'//prefix(1:jprefix)//'hdml.tmp')
       endif
       write(itm,'(a)') '80          ! # of gaussian points'
       write(itm,*) nptype1,ngroup1,nset1,
@@ -239,7 +239,7 @@ c im0=0: massive, 1: massless
 c ************************************************************
 c *********   HADRONIC RESUMMED *******************************
 c ************************************************************
-      open(unit=itm,file=prefix(1:jprefix)//'hdrs.tmp')
+      open(unit=itm,file='log/'//prefix(1:jprefix)//'hdrs.tmp')
 c type convention different in this program
 c      if(ibeam1.eq.1) then
 c         ib1rs=0
@@ -342,9 +342,9 @@ c *********   Pointlike massive and massless *****************
 c ************************************************************
          do im0=0,1
          if(im0.eq.0) then
-               open(unit=itm,file=prefix(1:jprefix)//'phmv.tmp')
+               open(unit=itm,file='log/'//prefix(1:jprefix)//'phmv.tmp')
          else
-               open(unit=itm,file=prefix(1:jprefix)//'phml.tmp')
+               open(unit=itm,file='log/'//prefix(1:jprefix)//'phml.tmp')
          endif
          write(itm,*) '80       ! # of gaussian points'
          write(itm,*) nset,'   ! nptype, ngroup, nset'
@@ -386,7 +386,7 @@ c Weizsaeker-Williams parameters in case of electron beam
 c ************************************************************
 c *********   Pointlike resummed *****************************
 c ************************************************************
-         open(unit=itm,file=prefix(1:jprefix)//'phrs.tmp')
+         open(unit=itm,file='log/'//prefix(1:jprefix)//'phrs.tmp')
          write(itm,*)'''phres.tmp'''
          write(itm,*)'0 0 0   ! 0 for no smearing'
 c in fact, only charm is implemented; just in case
@@ -431,7 +431,7 @@ c an electron
 
 c Run the program
       if(icalctype.eq.1.or.icalctype.eq.2.or.icalctype.eq.4) then
-         open(unit=55,file=prefix(1:jprefix)//'hdmv.tmp')
+         open(unit=55,file='log/'//prefix(1:jprefix)//'hdmv.tmp')
          call hdms(hdmassive)
          hdmassive=hdmassive*1.d6
          close(55)
@@ -439,7 +439,7 @@ c Run the program
          hdmassive=0
       endif
       if(icalctype.eq.1.or.icalctype.eq.4) then
-         open(unit=55,file=prefix(1:jprefix)//'hdml.tmp')
+         open(unit=55,file='log/'//prefix(1:jprefix)//'hdml.tmp')
          call hdms(hdmassless)
          hdmassless=hdmassless*1.d6
          close(55)
@@ -447,7 +447,7 @@ c Run the program
          hdmassless=0   
       endif
       if(icalctype.eq.1.or.icalctype.eq.3) then
-         open(unit=55,file=prefix(1:jprefix)//'hdrs.tmp')
+         open(unit=55,file='log/'//prefix(1:jprefix)//'hdrs.tmp')
          call hdrs(hdresummed,hdreserr)
          close(55)
       else
@@ -457,7 +457,7 @@ c Run the program
       if(    ibeam1.eq.4.or.ibeam1.eq.5
      #  .or. ibeam2.eq.4.or.ibeam2.eq.5 ) then
          if(icalctype.eq.1.or.icalctype.eq.2) then
-            open(unit=55,file=prefix(1:jprefix)//'phmv.tmp')
+            open(unit=55,file='log/'//prefix(1:jprefix)//'phmv.tmp')
             call phms(phmassive)
             phmassive=phmassive*1.d6
             close(55)
@@ -465,7 +465,7 @@ c Run the program
             phmassive=0
          endif
          if(icalctype.eq.1) then
-            open(unit=55,file=prefix(1:jprefix)//'phml.tmp')
+            open(unit=55,file='log/'//prefix(1:jprefix)//'phml.tmp')
             call phms(phmassless)
             phmassless=phmassless*1.d6
             close(55)
@@ -473,7 +473,7 @@ c Run the program
             phmassless=0
          endif
          if(icalctype.eq.1.or.icalctype.eq.3) then
-            open(unit=55,file=prefix(1:jprefix)//'phrs.tmp')
+            open(unit=55,file='log/'//prefix(1:jprefix)//'phrs.tmp')
             call phrs(phresummed,phreserr)
             close(55)
          else

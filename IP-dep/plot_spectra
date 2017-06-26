@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+import numpy as np
+import matplotlib.pyplot as plt
+import sys, h5py, vegas
+from scipy.interpolate import interpn
+from Glauber import Glauber_TA_py as TA
+
+# nuclear dictionary
+Adict = {'1': 'p',	'2':'d', '197': 'Au', '208': 'Pb'}
+
+#--------average shadowing---------------
+x0, y0 = np.loadtxt("/var/phy/project/nukeserv/wk42/hic-hvq/spectra/2760/pp_to_c.dat").T
+x1, y1 = np.loadtxt("/var/phy/project/nukeserv/wk42/hic-hvq/spectra/2760/PbPb_to_c.dat").T
+Ravg = y1/y0
+
+#---p+p-----
+sqrts = 2760
+f = h5py.File(sys.argv[1], 'r')
+ppref = f["{}-p-p-0.0-0.0".format(sqrts)]['dsigma_dpT2_dy'].value[0]
+f.close()
+
+#-----A+B----------
+NA = 208
+NB = 208
+db = 0.5
+brange = np.linspace(0,16,17)*db
+key_format = '{}-{}-{}-{}-{}'
+data3 = np.zeros([17, 17, 20])
+
+f = h5py.File(sys.argv[2], 'r')
+for i in range(17):
+	b1 = db*i	
+	for j in range(17):
+		b2 = db*j
+		bmin = np.min([b1, b2])
+		bmax = np.max([b1, b2])
+		key = key_format.format(sqrts, Adict[str(NA)], Adict[str(NB)], bmin, bmax)
+		data3[i,j] = f[key]['dsigma_dpT2_dy'].value[0]
+		pTrange = f[key]['pT'].value[0]
+f.close()
+
+# function TA*TB*dsigma_dpt2_dy
+@vegas.batchintegrand
+def numerator(xvec):
+	x, y, b = xvec.T
+	s1 = np.sqrt((x+b/2)**2+y**2)
+	s2 = np.sqrt((x-b/2)**2+y**2)
+	y1 = interpn((brange,brange), data, np.array([s1,s2]).T, method='linear', bounds_error=False, fill_value=None)
+	return TA(NA, s1)*TA(NB, s2)*y1
+
+# function TA*TB
+@vegas.batchintegrand
+def denominator(xvec):
+	x, y, b = xvec.T
+	s1 = np.sqrt((x+b/2)**2+y**2)
+	s2 = np.sqrt((x-b/2)**2+y**2)
+	return TA(NA, s1)*TA(NB, s2)
+
+# define centrality cuts
+cenL = [0, 30, 60]
+cenH = [10, 50, 80]
+ipL = [0.0, 8.55, 12.09]
+ipH = [4.94, 11.04, 13.97]
+Rmax=13.
+
+# for each centrality:
+for ic, (bmin, bmax) in enumerate(zip(ipL, ipH)):
+	# evaluate <TA*TB>
+	integ = vegas.Integrator([[-Rmax-bmax/2., Rmax+bmax/2.], [-Rmax, Rmax], [bmin, bmax]])
+	result = integ(denominator, nitn=10, neval=10000)
+	TAB = result.val
+	print ("T_AB = ", TAB)
+	print ("# i, pT, dNdpT2")
+
+	# evaluate <TA*TB*dsigma_dpt2_dy>
+	dNdpT = np.zeros_like(pTrange)
+	err = np.zeros_like(pTrange)
+	for ipT, pT in enumerate(pTrange):
+		data = data3[:,:,ipT]
+		integ = vegas.Integrator([[-Rmax-bmax/2., Rmax+bmax/2.], [-Rmax, Rmax], [bmin, bmax]])
+		result = integ(numerator, nitn=10, neval=4000)
+		dNdpT[ipT] = result.val
+		err[ipT] = result.sdev
+		print(ipT, pT, dNdpT[ipT])
+
+	# spectra = <TA*TB*dsigma_dpt2_dy>/<TA*TB>
+	dNdpT /= TAB
+	err /= TAB
+
+	# plot the shadowing Raa
+	plt.errorbar(pTrange, dNdpT/ppref, yerr=err/ppref, fmt='D', label=r"$cen = {}-{}\%$".format(cenL[ic], cenH[ic]))
+
+# plot the spatial averaged Raa
+plt.plot(x0, Ravg, 'k-', label="Spatial Avg. Shadowing")
+plt.legend(loc='lower right', framealpha=0., fontsize=15)
+
+plt.xlabel(r"$p_T$ [GeV]", size=15)
+plt.ylabel("EPS09s shadowing", size=15)
+plt.axis([-2, 50, 0.0, 1.3])
+plt.show()
+
+

@@ -257,10 +257,10 @@ string fit_parameters::get_filename(int eps_order, int eps_pset){
   string filename;
   switch(eps_order){
   case 1:
-    filename = "eps09sLO";
+    filename = "EPS09s-data/eps09sLO";
     break;
   case 2:
-    filename = "eps09sNLO";
+    filename = "EPS09s-data/eps09sNLO";
     break;
   default: //Checks that order is valid
     cout << "Invalid EPS09s order!! order = " << eps_order << endl;
