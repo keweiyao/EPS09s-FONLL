@@ -2,6 +2,8 @@
 *.so
 *.hdf5
 *.log
+*.out
 *.outlog
 *.tmp
 IP-dep/build
+IP-dep/log
