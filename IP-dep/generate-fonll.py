@@ -18,6 +18,8 @@ def fonll( sqrts=2760, A=[208, 208], b=[0.0, 8.0],
 	order_index = 1 if order == 'FONLL' else 2
 	tag = Adict[str(A[0])] + '-' + Adict[str(A[1])]
 	print ("system: ", tag)
+	if not os.path.exists("log"):
+		os.makedirs("log")
 	call('rm -r ./log/%s*'%tag, shell=True)
 	beam1 = A[0] if A[0]==1 else -A[0]*1000-EPS09_errorset
 	beam2 = A[1] if A[1]==1 else -A[1]*1000-EPS09_errorset
