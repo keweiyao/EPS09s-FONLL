@@ -181,21 +181,21 @@ C Read the table
       If (order .EQ. 1) then
 
         If (A < 10) Then
-        Write(filenimi,'("EPS09LOR_", I1)'), A
+        Write(filenimi,'("EPS09-data/EPS09LOR_", I1)'), A
         Else If (A < 100) Then
-        Write(filenimi,'("EPS09LOR_", I2)'), A
+        Write(filenimi,'("EPS09-data/EPS09LOR_", I2)'), A
         Else If (A < 1000) Then
-        Write(filenimi,'("EPS09LOR_", I3)'), A
+        Write(filenimi,'("EPS09-data/EPS09LOR_", I3)'), A
         End If
 
       Else
 
         If (A < 10) Then
-        Write(filenimi,'("EPS09NLOR_", I1)'), A
+        Write(filenimi,'("EPS09-data/EPS09NLOR_", I1)'), A
         Else If (A < 100) Then
-        Write(filenimi,'("EPS09NLOR_", I2)'), A
+        Write(filenimi,'("EPS09-data/EPS09NLOR_", I2)'), A
         Else If (A < 1000) Then
-        Write(filenimi,'("EPS09NLOR_", I3)'), A
+        Write(filenimi,'("EPS09-data/EPS09NLOR_", I3)'), A
         End If
 
       End If

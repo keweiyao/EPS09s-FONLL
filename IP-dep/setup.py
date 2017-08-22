@@ -5,7 +5,7 @@ from glob import glob
 import numpy
 
 #-------------Transform Module------------------
-filelist1 = ["./EPS09s-Glauber-python-interface/Glauber.pyx", 
+filelist1 = ["./EPS09s-Glauber-cython/Glauber.pyx", 
 			 "./EPS09s-interface-cpp/eps09s.cpp"]
 extensions = [
 	Extension(

@@ -92,8 +92,9 @@ c... (note that A was a real in eks98, but an integer in eps09, hence AA)
            if (ih .eq. 200) then 
              IP = distance2
            endif      
+           if (IP.gt.0.0) then
            call eps09s(2,pset,AA,xs,q,IP,ruv,rdv,ru,rd,rs,rc,rb,rg)
-		   ta = ta_eps09s(AA, IP)
+           ta = ta_eps09s(AA, IP)
            ruv = ruv/ta
            rdv = rdv/ta
            ru = ru/ta
@@ -101,7 +102,10 @@ c... (note that A was a real in eks98, but an integer in eps09, hence AA)
            rs = rs/ta
            rc = rc/ta
            rb = rb/ta
-           rg = rg/ta         
+           rg = rg/ta  
+           else
+           call eps09(2,pset,AA,xs,q,ruv,rdv,ru,rd,rs,rc,rb,rg)
+           endif
 	     endif
 	     	     
 	     fx(0) = fx(0)*rg                           ! gluon

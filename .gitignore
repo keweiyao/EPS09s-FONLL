@@ -7,3 +7,4 @@
 *.tmp
 IP-dep/build
 IP-dep/log
+IP-dep/*
