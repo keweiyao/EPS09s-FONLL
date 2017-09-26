@@ -12,11 +12,11 @@ line = ff.FortranRecordReader('(F20.0)')
 Adict = {'1': 'p',	'2':'d', '197': 'Au', '208': 'Pb'}
 
 # 2-31 are errorsets
-def fonll( sqrts=2760, A=[208, 208], b=[0.0, 0.0], 
-			pT=10.0, y=0.0,
-			M=1.3, scale=1.0, 
-			EPS09_errorset = 1, 
-			order = 'FONLL'):
+def fonll( sqrts, A, b, 
+			pT, y,
+			M, scale, 
+			EPS09_errorset, 
+			order, PDF):
 	order_index = 1 if order == 'FONLL' else 2
 	tag = Adict[str(A[0])] + '-' + Adict[str(A[1])]
 	print ("system: ", tag)
@@ -27,18 +27,18 @@ def fonll( sqrts=2760, A=[208, 208], b=[0.0, 0.0],
 	beam2 = A[1] if A[1]==1 else -A[1]*1000-EPS09_errorset
 	b1, b2 = b
 	
-	print ("pt = {} [GeV], y = {}".format(pT, y) )
+	print ("pt = {} [GeV], y = {}, PDF = {}".format(pT, y, PDF) )
 	inputs = """{}
-{} {} {} 0 0 10550 
-{} {} {} 0 0 10550
+{} {} {} 0 0 {:d}
+{} {} {} 0 0 {:d}
 {}
 -1
 {} {}
 {} {}
 {}
 """.format(	"{}-{}".format(tag, y), 
-			beam1, b1, 0.5*sqrts, 
-			beam2, b2, 0.5*sqrts, 
+			beam1, b1, 0.5*sqrts, PDF,
+			beam2, b2, 0.5*sqrts, PDF,
 			M, 
 			scale, scale, 
 			pT, y, 
@@ -57,13 +57,15 @@ def fonll( sqrts=2760, A=[208, 208], b=[0.0, 0.0],
 				dsigma_dpT2_dy = line.read(nl[3])[0]*1e-9 # from pb/GeV2 to mb/Gev2
 	return {"y": y, "pT": pT, "X": dsigma_dpT2_dy}
 
-def calculate_at_y(y, sqrts, A, B, b1, b2, pT, M):
+def calculate_at_y(y, sqrts, A, B, b1, b2, pT, M, tPDF):
+	print(tPDF)
 	return fonll(  sqrts=sqrts, A=[A, B], b=[b1, b2], 
-				pT=pT, y=y,
-				M=M, scale=1.0, EPS09_errorset=1, order='FONLL')
+					pT=pT, y=y,
+					M=M, scale=1.0, EPS09_errorset=1, 
+					order='FONLL', PDF=tPDF)
 
-def calculate_at_b1_b2(M, sqrts, A, B, b1, b2, NpT):	
-	pT = M*np.linspace(0.1**0.25, 100**0.25, NpT)**4
+def calculate_at_b1_b2(M, sqrts, A, B, b1, b2, NpT, PDF):	
+	pT = M*np.linspace(0.1, 100, NpT)
 	mT = np.sqrt(pT**2 + M**2)
 	Ny = 7
 	ymax = np.arccosh(sqrts/2./mT)
@@ -79,7 +81,8 @@ def calculate_at_b1_b2(M, sqrts, A, B, b1, b2, NpT):
 							zip(yarray, repeat(sqrts),
 								repeat(A), repeat(B),
 								repeat(b1), repeat(b2),
-								repeat(ipT), repeat(M))
+								repeat(ipT), repeat(M),
+								repeat(PDF)	)
 								)
 		
 		for ds in all_ds:
@@ -90,55 +93,34 @@ def calculate_at_b1_b2(M, sqrts, A, B, b1, b2, NpT):
 	return ymax, pT, X
 
 def main():
-	M, sqrts = 1.3, 5020
+	M, sqrts = 1.3, 2760
 	A, B = 208, 208
 	tag = Adict[str(A)] + '-' + Adict[str(B)]
-	NpT, Ny_half = 20, 7
-	bmin, bmax, Nb = 0.0, 10.0, 11
-	barray = np.linspace(bmin, bmax, Nb)
+	NpT, Ny_half = 100, 7
+	f = h5py.File("spectra0.hdf5",'a')
+	XAB = np.zeros([2*Ny_half-1, NpT])
+	Xpp = np.zeros([2*Ny_half-1, NpT])
+	# The averaged dsigam_dpT_dy per collison -- EPS09 + CTEQ6.6 / CTEQ6.6
+	#if 'nCTEQ15np' in f:
+	#	del f['nCTEQ15np']
+	#gp0 = f.create_group("nCTEQ15np")
+	#gp = gp0.create_group("Pb-Pb-5020")
+	gp0 = f["nCTEQ15np"]
+	del f["nCTEQ15np/Pb-Pb-2760"]
+	gp = gp0.create_group("Pb-Pb-2760")
 
-	# The averaged dsigam_dpT_dy per collison
-	ymax, pT, X0 = calculate_at_b1_b2(M, sqrts, A, B, -1, -1, NpT)
+	ymax, pT, XAB_half = calculate_at_b1_b2(M, sqrts, 1, 1, -1, -1, NpT, 105100)
+	XAB[Ny_half:] = XAB_half[:-1]
+	XAB[:Ny_half] = XAB_half[::-1]
+	gp.create_dataset('AB', data=XAB)
 
-	# The averaged dsigam_dpT_dy per collison
-	ymax, pTfiner, Xfiner = calculate_at_b1_b2(M, sqrts, A, B, -1, -1, NpT*3)
-
-	# pp-ref at the same energy and pT point
-	ymax, pTfiner, Xpp = calculate_at_b1_b2(M, sqrts, 1, 1, -1, -1, NpT*3)
-
-	# This b1,b2-dependent dsigma_dpTdy per collision dims = [Nb1, Nb2, Ny, NpT]
-	# This grid is coarse
-	Rarray = np.zeros([Nb, Nb, 2*Ny_half-1, NpT])
-	for i1, b1 in enumerate(barray):
-		for i2, b2 in enumerate(barray):
-			ymax, pT, X = calculate_at_b1_b2(M, sqrts, A, B, b1, b2, NpT)
-			Rarray[i1, i2, 6:] = X/X0
-	for i1 in range(Nb):
-		for i2 in range(Nb):
-			cut = Rarray[i1, i2, 7:]
-			Rarray[i1, i2, :6] = cut[::-1]
+	ymax, pT, Xpp_half = calculate_at_b1_b2(M, sqrts, 1, 1, -1, -1, NpT, 104000)
+	Xpp[Ny_half:] = Xpp_half[:-1]
+	Xpp[:Ny_half] = Xpp_half[::-1]
+	gp.create_dataset('pp', data=Xpp)
 	
-	# save to file
-	path = './spectra/'
-	filename = 'lhc-PbPb-b1-b2-y-pT.hdf5'
-	if not os.path.exists(path):
-		os.makedirs(path)
-	f = h5py.File(path+filename, 'a')
-	gp = f.create_group("{}-{}".format(sqrts,tag))
-	gp.create_dataset('b1', data=barray)
-	gp.create_dataset('b2', data=barray)
-	gp.create_dataset('ymax', data=ymax)
-	gp.create_dataset('pT', data=pT)
-	gp.create_dataset('pTfiner', data=pTfiner)
-	gp.attrs.create('M', M)
-	gp.attrs.create('A', A)
-	gp.attrs.create('B', B)
-	gp.attrs.create('sqrts', sqrts)
-	gp.create_dataset('X-IP/avg', data=Rarray)
-	gp.create_dataset('X-avg', data=Xfiner)
-	gp.create_dataset('X-pp', data=Xpp)
-	f.close()
 
+	f.close()
 
 if __name__ == '__main__':
 	main()

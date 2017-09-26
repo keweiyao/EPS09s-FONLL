@@ -65,7 +65,7 @@ def FONLL_spectra(nuA='Pb', nuB='Pb', sqrts=2760):
 
 
 # spectra fucntion
-b1, b2, normy, pT, dsigma, func = FONLL_spectra(sqrts=5020)
+b1, b2, normy, pT, dsigma, func = FONLL_spectra(sqrts=2760)
 NA = 208
 NB = 208
 M = 1.3
@@ -157,10 +157,10 @@ for ic, (bmin, bmax) in enumerate(zip(ipL, ipH)):
 	result = integ(numerator, nitn=10, neval=4000)
 	sigma_tot = result.val/TAB
 	err_sigma_tot = result.sdev/TAB
-	print(sigma_tot, " +/- ", err_sigma_tot)
-	f.write("{}\t{}\t{}\t{}\t{}\n".format(cenL[ic], cenH[ic], TAB, sigma_tot, err_sigma_tot))
-f.close()
-"""
+#	print(sigma_tot, " +/- ", err_sigma_tot)
+#	f.write("{}\t{}\t{}\t{}\t{}\n".format(cenL[ic], cenH[ic], TAB, sigma_tot, err_sigma_tot))
+#f.close()
+
 	# evaluate <TA*TB*dsigma_dpt2_dy>
 	dNdpT = np.zeros_like(pT)
 	err = np.zeros_like(pT)
@@ -177,12 +177,12 @@ f.close()
 	err /= TAB
 	ppref = pp_ref(pT)
 	plt.errorbar(pT, dNdpT/ppref, yerr=err/ppref, fmt='-', label=r"$cen = {}-{}\%$".format(cenL[ic], cenH[ic]))
-"""
-"""
+
+
 plt.legend(loc='lower right', framealpha=0., fontsize=15)
 plt.xlabel(r"$p_T$ [GeV]", size=15)
 plt.ylabel(r"$R_{AuAu}$ EPS09s shadowing", size=15)
 
 plt.show()
-"""
+
 
